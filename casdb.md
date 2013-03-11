@@ -20,7 +20,7 @@ Programming model
     while true
         foo, foo_version = db.get("foo")
         foo' = mutate(foo)
-        result = db.put(foo2, foo_version)
+        result = db.put(foo', foo_version)
         if result == success then
             break
     perform_other_action(foo')
