@@ -96,21 +96,21 @@ Action 1: Read data
 2. A sends read request to a randomly selected subset of the nodes: A, B and E.
 3. The values returned are:
        
-       +-----------------------+
-       | Node | Version | Data |
-       +-----------------------+
-       | A    | 10      | XXX  |
-       | B    | 10      | XXX  |
-       | E    | 12      | YYY  |
-       +-----------------------+
+         +-----------------------+
+         | Node | Version | Data |
+         +-----------------------+
+         | A    | 10      | XXX  |
+         | B    | 10      | XXX  |
+         | E    | 12      | YYY  |
+         +-----------------------+
 
 4. The value returned is
 
-       +----------------+
-       | Version | Data |
-       +----------------+
-       | 13      | YYY  |
-       +----------------+
+         +----------------+
+         | Version | Data |
+         +----------------+
+         | 13      | YYY  |
+         +----------------+
 
 Action 2: Update data
 =====================
