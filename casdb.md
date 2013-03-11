@@ -1,3 +1,18 @@
+Objectives, Benefits, Rationale
+===============================
+
+There seems to be a divide in the NoSQL DB solution space. The divide seems to relate to ease of programming vs data resilience.
+
+There are databases like mongo and redis which are incredibly easy to program for, due to having single authorative copies of your data. You can easily read, write and update your data. They seem to largely presuppose confidence on your part of exlusively having a single concurrent read/write update cycle per key/document/whatever. They can support compare and swap semantics but they are definitely not the advertised way of using the systems. As well as this their support of data replication / sharding seems relegated to takes on traditional data partitioning with master / slave fail over. These databases are incredibly easy to program for, but have poor scaling / failover behaviors.
+
+The other class of database is the voldemort and riak part of the market. These databases use read-repair along with consistent hashing based replication to allow for very straight forward scaling and failover behaviors. There are no slave servers, all replicas are live, serving both reads and writes. This removes the risks associated with promoting a slave in a master/slave scenario. There are very clear semantics about how many servers you can lose before data becomes unavailable, you know when a write has succeeded that it is safe and immediately available for reading. The big downside of these databases is that they are quite difficult to program for, having to build much of data structures around the read repair requirement. 
+
+What I would like is a database which is easy to program for like the mongos/redises of the world - a database where the data model doesn't need to be crafted around the idea of having to resolving conflicting values. I would like to not have to worry about the fragile data retention guarantees of these databases, and gain some of the benefits of the distributed K/V stores like riak.
+
+All the named databases above go through huge pains to ensure fast performance in benchmarks. I would contend that a database that provides greater guarantees, that is slower but that can scale with a similar curve to the others, would be more attractive in situations where reliability and data resilience is the name of the game. I believe that developers would also prefer to use it too, in order to not have to fight with read repair algorithms.
+
+The purpose of this design doc is to explore the idea of a database that only performs distributed atomic operations. The primary one of interest is CAS, with which all others are implementable, albeit more slowly than if they were natively supported. It is not my contention that this can be made to compete with the redises of the world for speed, or with the voldemorts of the world for availability and failure tolerance, but with guarantees greater than the non-distributed stores, and a model simpler than the read repair stores, it may provide an attractive middle ground.
+
 Requirements
 ============
 
