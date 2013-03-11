@@ -1,5 +1,5 @@
 Requirements
-------------
+============
 
   * Distributed database.
   * Master/Master replication of data.
@@ -15,7 +15,7 @@ Requirements
   * Need to guarantee forward progress.
 
 Programming model
------------------
+=================
 
     while true
         foo, foo_version = db.get("foo")
@@ -32,12 +32,12 @@ written in order to perform secondary operations, because that value is either c
 a direct ancestor of whatever data that key now holds.
 
 Data / distribution model
--------------------------
+=========================
 
 All reads and writes are performed over a quorum of the replicas of the data.
 
 Requesting data
-===============
+---------------
 
 1. Request sent to a node to get [KEY]
 2. The requestee forwards the request to (N/2 + 1) of the other nodes.
@@ -45,7 +45,7 @@ Requesting data
 4. A returns the highest versioned value, at [VERSION] + 1 to the client.
 
 Updating data
-=============
+-------------
 
 In order to ensure forward progress each key can have up to two transactions associated with it, the current
 transaction, and the transaction to be processed next. There is a proper ordering over transactions based on
@@ -78,8 +78,8 @@ successfully update the value of the key.
    transaction is either stored or thrown away depending. If there is a pending transaction associated
    with the one being finalized, perform step (3) for that transaction.
 
-Example
--------
+Examples
+========
 
 Cluster of 5 nodes. Each node knows about each other node, in a totally connected graph.
 
@@ -90,7 +90,7 @@ Cluster of 5 nodes. Each node knows about each other node, in a totally connecte
      ----- [ E ] -----
 
 Action 1: Read data
-===================
+-------------------
 
 1. Request is sent to node A for "FOO"
 2. A sends read request to a randomly selected subset of the nodes: A, B and E.
@@ -113,7 +113,7 @@ Action 1: Read data
          +----------------+
 
 Action 2: Update data
-=====================
+---------------------
 
 1. Request is sent to A for "FOO", and executes exactly as in Action 1.
 2. Send an update to C for "FOO" with data "AAA" and version 13.
@@ -124,7 +124,7 @@ Action 2: Update data
 7. It returns a success message to the clients.
 
 Action 3: Update conflict
-=========================
+-------------------------
 
 1. Request is sent to A for "FOO", and executes exactly as in Action 1.
 2. Send an update to C for "FOO" with data "AAA" and version 13.
@@ -150,7 +150,7 @@ Action 3: Update conflict
     * "FOO" = "BBB" and the client has been informed.
 
 Action 4: Update conflict 2
-===========================
+---------------------------
 
 1. Request sent to A for "FOO", and executes exactly as in Action 1.
 2. Send an update to C for "FOO" with data "AAA" and version 13.
