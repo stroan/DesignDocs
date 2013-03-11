@@ -72,9 +72,9 @@ successfully update the value of the key.
 2. The requestee informs itself, and (N/2 + 1) of the other nodes to start a transaction for [KEY], 
    wrt [VERSION], with transaction id [TID] transactions ids are large integer identifiers which can be 
    assumed to be globally unique, so 128bit probably.
-2. When each node receives the request to start a new transaction is does the following:
+3. When each node receives the request to start a new transaction is does the following:
     1. Checks to see if there is an open transaction for [KEY].
-       * If there is no open transaction, open one. And process the transaction as below (3)
+       * If there is no open transaction, open one. And process the transaction as below (4)
        * If there is an open transaction, and its transaction id is less than [TID] then fail the new
          transaction.
        * If there is an open transaction, and its transaction id is greater than or equal to the [TID] 
@@ -84,14 +84,14 @@ successfully update the value of the key.
          * If there is a pending transaction, and its tid is less than [TID] then fail the transaction.
          * If there is a pending transaction, and its tid is greater than or equal to [TID] then fail
            the pending transaction and set the current transaction as the pending transaction.
-3. If there is an open transaction after (2), then load the data for key, and check [VERSION] against
+4. If there is an open transaction after (3), then load the data for key, and check [VERSION] against
    the version loaded. If [VERSION] is strictly greater than the value seen mark the transaction as 
    OK, otherwise send a FAIL response.
-4. A gets back OKs/FAILs. If all are OK, A sends commit signal to A, B and C for that transaction id,
+5. A gets back OKs/FAILs. If all are OK, A sends commit signal to A, B and C for that transaction id,
    otherwise it sends a ROLLBACK instruction and informs the client that the update failed.
-5. When the other nodes receive a COMMIT or ROLLBACK message from the requester the data in the open
+6. When the other nodes receive a COMMIT or ROLLBACK message from the requester the data in the open
    transaction is either stored or thrown away depending. If there is a pending transaction associated
-   with the one being finalized, perform step (3) for that transaction.
+   with the one being finalized, perform step (4) for that transaction.
 
 Examples
 ========
