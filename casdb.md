@@ -46,8 +46,8 @@ read and write operations, so no data has been lost. You can then use the copy o
 written in order to perform secondary operations, because that value is either currently in the database or is
 a direct ancestor of whatever data that key now holds.
 
-Data / distribution model
-=========================
+Data model
+==========
 
 All reads and writes are performed over a quorum of the replicas of the data.
 
