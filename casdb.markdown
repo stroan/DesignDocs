@@ -62,36 +62,18 @@ Requesting data
 Updating data
 -------------
 
-In order to ensure forward progress each key can have up to two transactions associated with it, the current
-transaction, and the transaction to be processed next. There is a proper ordering over transactions based on
-the random identifier associated with them at creation. This ensures that in the situation where there are 
-a set of transactions trying to update a single key propogating through the system, that one of them will 
-successfully update the value of the key.
+In order to ensure forward progress each key can have arbitrarily many transactions associated, the current transaction, and the transactions to be processed next. There is a proper ordering over transactions based on the random identifier associated with them at creation. This ensures that in the situation where there are a set of transactions trying to update a single key propogating through the system, that one of them will successfully update the value of the key.
 
 1. Request sent to a node to put [KEY] on top of [VERSION]
-2. The requestee informs (N/2 + 1) of the nodes to start a transaction for [KEY], 
-   wrt [VERSION], with transaction id [TID] transactions ids are large integer identifiers which can be 
-   assumed to be globally unique, so 128bit probably.
+2. The requestee informs (N/2 + 1) of the nodes to start a transaction for [KEY], wrt [VERSION], with transaction id [TID] transactions ids are large integer identifiers which can be assumed to be globally unique, so 128bit probably.
 3. When each node receives the request to start a new transaction is does the following:
     1. Checks to see if there is an open transaction for [KEY].
        * If there is no open transaction, open one. And process the transaction as below (4)
-       * If there is an open transaction, and its transaction id is less than [TID] then fail the new
-         transaction.
-       * If there is an open transaction, and its transaction id is greater than or equal to the [TID] 
-         then check to see if there is a pending transaction for that key.
-         * If there is no pending transaction, set the new transaction as the current pending 
-           transaction.
-         * If there is a pending transaction, and its tid is less than [TID] then fail the transaction.
-         * If there is a pending transaction, and its tid is greater than or equal to [TID] then fail
-           the pending transaction and set the current transaction as the pending transaction.
-4. If there is an open transaction after (3), then load the data for key, and check [VERSION] against
-   the version loaded. If [VERSION] is strictly greater than the value seen mark the transaction as 
-   OK, otherwise send a FAIL response.
-5. A gets back OKs/FAILs. If all are OK, A sends commit signal to A, B and C for that transaction id,
-   otherwise it sends a ROLLBACK instruction and informs the client that the update failed.
-6. When the other nodes receive a COMMIT or ROLLBACK message from the requester the data in the open
-   transaction is either stored or thrown away depending. If there is a pending transaction associated
-   with the one being finalized, perform step (4) for that transaction.
+       * If there is an open transaction, and its transaction id is less than [TID] then fail the new transaction.
+       * If there is an open transaction, and its transaction id is greater than or equal to the [TID] then enqueue the new transaction as the current pending transaction. The queue orders keeps the transactions in order of transaction id, with the largest transaction id at the head of the queue.
+4. If there is an open transaction after (3), then load the data for key, and check [VERSION] against the version loaded. If [VERSION] is strictly greater than the value seen mark the transaction as OK, otherwise send a FAIL response.
+5. The requestee gets back OKs/FAILs. If all are OK, A sends commit signal to A, B and C for that transaction id,otherwise it sends a ROLLBACK instruction and informs the client that the update failed.
+6. When the other nodes receive a COMMIT or ROLLBACK message from the requester the data in the open transaction is either stored or thrown away depending. If there are any pending transactions associated with the one being finalized, pop the head of the transaction queue and make it the current transaction and perform (3).
 
 Examples
 ========
@@ -196,10 +178,3 @@ Action 4: Update conflict 2
 20. A rolls back [TID2], and executes the pending transaction [TID1] and sends OK to E.
 21. E has received all 3 responses, all of which are OK, so it sends commit to E, A and B. It
     also informs the client of success. "FOO" = "CCC" and all clients have been informed.
-
-Bugs
-====
-
-ROLLBACK is sent to the client, and can be acted upon before other nodes receive ROLLBACK. Solultion is to allow for a queue of pending actions, so any actions applied will be queued or discarded, not squeezed out by new transactions.
-
-
