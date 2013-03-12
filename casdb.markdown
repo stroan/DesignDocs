@@ -69,7 +69,7 @@ a set of transactions trying to update a single key propogating through the syst
 successfully update the value of the key.
 
 1. Request sent to a node to put [KEY] on top of [VERSION]
-2. The requestee informs itself, and (N/2 + 1) of the other nodes to start a transaction for [KEY], 
+2. The requestee informs (N/2 + 1) of the nodes to start a transaction for [KEY], 
    wrt [VERSION], with transaction id [TID] transactions ids are large integer identifiers which can be 
    assumed to be globally unique, so 128bit probably.
 3. When each node receives the request to start a new transaction is does the following:
