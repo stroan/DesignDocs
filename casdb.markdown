@@ -1,6 +1,6 @@
 DEAD
-===============================
-This project was silly. Voldemort with quorum read/write provides all that this project aimed for.
+====
+This project may be better phrased as voldemort with 3PC. Will write up a new proposal.
 
 
 Objectives, Benefits, Rationale
