@@ -171,3 +171,8 @@ Action 4: Update conflict 2
 20. A commits [TID2], and executes the pending transaction [TID1] and sends FAIL to E.
 21. B commits [TID2], and executes the pending transaction [TID1] and sends FAIL to E.
 21. E has received all 3 responses, two of which is fail, so it sends commit to E, A and B. It also informs the client of failure. "FOO" = "BBB" and all clients have been informed.
+
+Outstanding issues
+==================
+
+* Fault tollerance / data integrity when nodes fail during commit phase.
