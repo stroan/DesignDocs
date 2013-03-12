@@ -197,3 +197,9 @@ Action 4: Update conflict 2
 21. E has received all 3 responses, all of which are OK, so it sends commit to E, A and B. It
     also informs the client of success. "FOO" = "CCC" and all clients have been informed.
 
+Bugs
+----
+
+ROLLBACK is sent to the client, and can be acted upon before other nodes receive ROLLBACK. Solultion is to allow for a queue of pending actions, so any actions applied will be queued or discarded, not squeezed out by new transactions.
+
+
