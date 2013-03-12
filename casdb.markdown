@@ -161,20 +161,13 @@ Action 4: Update conflict 2
 10. C receives the request for [TID3], and opens a transaction and reports OK to C.
 11. A receives the request for [TID2], and opens a transaction and reports OK to D.
 12. B receives the request for [TID3], and opens a transaction and reports OK to C.
-13. A receives the request for [TID1]. It has an open transaction. [TID1] < [TID2] so [TID1] is
-    set as the pending transaction on A.
-14. B receives the request for [TID2]. It has an open transaction. [TID2] < [TID3] to [TID2] is
-    set as the pending transaction on B.
-15. D receives the request for [TID3]. It has an open transaction. [TID3] > [TID2], so it reports
-    FAIL to C.
-16. B receives the request for [TID1]. It has an open transaction. [TID1] < [TID3], so it tries
-    to be set as the pending transaction. There is a current pending transaction. [TID2] > [TID1]
-    to [TID1] is set as the pending migration and FAIL is send to D.
-17. C has received all 3 responses, one of which is a FAIL, so it sends ROLLBACK to C, B and D.
-    It also informs the client of failure.
-18. B rolls back [TID3], and executes the pending transaction [TID1] and sends OK to E.
-19. D has received all 3 responses, one of which is a FAIL, so it sends ROLLBACK to D, A and B.
-    It also informs the client of failure.
-20. A rolls back [TID2], and executes the pending transaction [TID1] and sends OK to E.
-21. E has received all 3 responses, all of which are OK, so it sends commit to E, A and B. It
-    also informs the client of success. "FOO" = "CCC" and all clients have been informed.
+13. A receives the request for [TID1]. It has an open transaction. [TID1] < [TID2] so [TID1] is set as the pending transaction on A.
+14. B receives the request for [TID2]. It has an open transaction. [TID2] < [TID3] so [TID2] is set as the pending transaction on B.
+15. D receives the request for [TID3]. It has an open transaction. [TID3] > [TID2], so it reports FAIL to C.
+16. B receives the request for [TID1]. It has an open transaction. [TID1] < [TID3], so it tries to be set as the pending transaction. There is a current pending transaction. [TID2] > [TID1] to [TID1] is set as the second pending migration.
+17. C has received a FAIL, so it sends ROLLBACK to C, B and D. It also informs the client of failure.
+18. B rolls back [TID3], and executes the pending transaction [TID2] and sends OK to D.
+19. D has received all 3 responses, all of which are OK, so it sends COMMIT to D, A and B. It also informs the client of success.
+20. A commits [TID2], and executes the pending transaction [TID1] and sends FAIL to E.
+21. B commits [TID2], and executes the pending transaction [TID1] and sends FAIL to E.
+21. E has received all 3 responses, two of which is fail, so it sends commit to E, A and B. It also informs the client of failure. "FOO" = "BBB" and all clients have been informed.
