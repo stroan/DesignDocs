@@ -1,3 +1,8 @@
+DEAD
+===============================
+This project was silly. Voldemort with quorum read/write provides all that this project aimed for.
+
+
 Objectives, Benefits, Rationale
 ===============================
 
@@ -72,8 +77,20 @@ In order to ensure forward progress each key can have arbitrarily many transacti
        * If there is an open transaction, and its transaction id is less than [TID] then fail the new transaction.
        * If there is an open transaction, and its transaction id is greater than or equal to the [TID] then enqueue the new transaction as the current pending transaction. The queue orders keeps the transactions in order of transaction id, with the largest transaction id at the head of the queue.
 4. If there is an open transaction after (3), then load the data for key, and check [VERSION] against the version loaded. If [VERSION] is strictly greater than the value seen mark the transaction as OK, otherwise send a FAIL response.
-5. The requestee gets back OKs/FAILs. If all are OK, A sends commit signal to A, B and C for that transaction id,otherwise it sends a ROLLBACK instruction and informs the client that the update failed.
-6. When the other nodes receive a COMMIT or ROLLBACK message from the requester the data in the open transaction is either stored or thrown away depending. If there are any pending transactions associated with the one being finalized, pop the head of the transaction queue and make it the current transaction and perform (3).
+5. The requestee gets back OKs/FAILs. If all are OK, A sends commit signal to A, B and C for that transaction id,otherwise it sends a ROLLBACK instruction.
+6. When the other nodes receive a COMMIT or ROLLBACK message from the requester the data in the open transaction 
+   is either stored or thrown away depending. If there are any pending transactions associated with the one being 
+   finalized, pop the head of the transaction queue and make it the current transaction and perform (3).
+   
+   Sends an acknowledgement of the action to the requestee.
+7. Requestee informs the client once all acknlowledgements have been received.
+
+### Failure cases
+
+* Coordinator fails pre sending out any commits. Client detects failure. Transactions all timeout.
+* Coordinator fails post sending out all commits. Client detects failure, the transaction succeeds.
+* Coordinator fails after sending some commits. Client detects failure. The transaction is committed by the 
+  machines that got the commit, but not by the ones that didn't.
 
 Examples
 ========
